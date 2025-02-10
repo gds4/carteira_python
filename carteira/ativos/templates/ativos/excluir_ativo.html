@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Excluir Ativo{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Excluir Ativo</h2>
+    <p>Você tem certeza que deseja excluir o seguinte ativo?</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tipo</th>
+                <th>Ticker</th>
+                <th>Quantidade</th>
+                <th>Preço Médio</th>
+                <th>Preço Atual</th>
+                <th>Valor Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ ativo.tipo }}</td>
+                <td>{{ ativo.ticker }}</td>
+                <td>{{ ativo.quantidade }}</td>
+                <td>R$ {{ ativo.preco_medio }}</td>
+                <td>
+                    {% if ativo.preco_atual %}
+                        R$ {{ ativo.preco_atual }}
+                    {% else %}
+                        Não disponível
+                    {% endif %}
+                </td>
+                <td>R$ {{ ativo.valor_total }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+    </form>
+</div>
+{% endblock %}

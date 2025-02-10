@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Listar Ativos{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Ativos Cadastrados</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tipo</th>
+                <th>Ticker</th>
+                <th>Quantidade</th>
+                <th>Preço Médio</th>
+                <th>Preço Atual</th>
+                <th>Valor Total</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ativo in ativos %}
+            <tr>
+                <td>{{ ativo.tipo }}</td>
+                <td>{{ ativo.ticker }}</td>
+                <td>{{ ativo.quantidade }}</td>
+                <td>R$ {{ ativo.preco_medio }}</td>
+                <td>
+                    {% if ativo.preco_atual %}
+                        R$ {{ ativo.preco_atual }}
+                    {% else %}
+                        Não disponível
+                    {% endif %}
+                </td>
+                <td>R$ {{ ativo.valor_total }}</td>
+                <td>
+                    <a href="{% url 'atualizar_ativo' ativo.pk %}" class="btn btn-warning">Atualizar</a>
+                    <a href="{% url 'excluir_ativo' ativo.pk %}" class="btn btn-danger">Excluir</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Atualizar Ativo{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Atualizar Ativo</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Atualizar</button>
+    </form>
+
+    <div class="mt-4">
+        <h4>Preço Atual</h4>
+        {% if ativo.preco_atual %}
+            <p>R$ {{ ativo.preco_atual }}</p>
+        {% else %}
+            <p>Preço atual não disponível.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

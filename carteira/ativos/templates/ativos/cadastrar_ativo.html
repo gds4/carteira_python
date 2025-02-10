@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastrar Ativo{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Cadastrar Novo Ativo</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Cadastrar</button>
+    </form>
+
+    <!-- Dropdown de sugestões de tickers -->
+    <div class="mt-2">
+        <label for="ticker-input">Ticker:</label>
+        <input type="text" id="ticker-input" class="form-control" autocomplete="off" placeholder="Digite o ticker">
+        <select id="ticker-dropdown" class="form-control mt-2" size="5" style="display: none;">
+            <!-- As opções serão preenchidas dinamicamente -->
+        </select>
+    </div>
+
+    {% if form.instance.pk %}
+        <div class="mt-4">
+            <h4>Preço Atual</h4>
+            {% if form.instance.preco_atual %}
+                <p>R$ {{ form.instance.preco_atual }}</p>
+            {% else %}
+                <p>Preço atual não disponível.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    const tickerInput = document.getElementById('ticker-input');
+    const tickerDropdown = document.getElementById('ticker-dropdown');
+
+    // Evento de input para filtrar as opções do ticker
+    tickerInput.addEventListener('input', function() {
+        const query = this.value;
+        if (query.length > 0) {
+            fetch(`/autocomplete-tickers/?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Limpa o dropdown
+                    tickerDropdown.innerHTML = '';
+
+                    // Adiciona as sugestões filtradas no dropdown
+                    if (data.tickers.length) {
+                        tickerDropdown.style.display = 'block';  // Exibe o dropdown
+                        data.tickers.forEach(ticker => {
+                            const option = document.createElement('option');
+                            option.value = ticker;
+                            option.textContent = ticker;
+                            tickerDropdown.appendChild(option);
+                        });
+                    } else {
+                        tickerDropdown.style.display = 'none';  // Oculta o dropdown se não houver sugestões
+                    }
+                });
+        } else {
+            tickerDropdown.style.display = 'none';  // Oculta o dropdown se a consulta estiver vazia
+        }
+    });
+
+    // Quando o usuário seleciona uma opção, preencher o campo de texto
+    tickerDropdown.addEventListener('change', function() {
+        tickerInput.value = tickerDropdown.value;
+        tickerDropdown.style.display = 'none';  // Fecha o dropdown
+    });
+
+    // Fecha o dropdown se clicar fora dele
+    document.addEventListener('click', function(e) {
+        if (!tickerInput.contains(e.target) && !tickerDropdown.contains(e.target)) {
+            tickerDropdown.style.display = 'none';  // Fecha o dropdown
+        }
+    });
+</script>
+
+{% endblock %}
