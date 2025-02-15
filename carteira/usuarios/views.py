@@ -2,6 +2,7 @@ from ativos.models import Ativo
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib import messages
 from django.shortcuts import redirect, render
 
 from .forms import RegistroForm
@@ -13,7 +14,9 @@ def registro(request):
         if form.is_valid():
             user = form.save()
             login(request, user)  
-            return redirect("dashboard")  
+            return redirect("dashboard")
+        else:
+            messages.error(request, "Erro no formulário. Por favor, verifique os dados inseridos.")
     else:
         form = RegistroForm()
     return render(request, "usuarios/registro.html", {"form": form})
