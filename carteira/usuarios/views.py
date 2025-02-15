@@ -16,7 +16,7 @@ def registro(request):
             login(request, user)  
             return redirect("dashboard")
         else:
-            messages.error(request, "Erro no formulário. Por favor, verifique os dados inseridos.")
+            messages.error(request, "Erro no formulário.")
     else:
         form = RegistroForm()
     return render(request, "usuarios/registro.html", {"form": form})
