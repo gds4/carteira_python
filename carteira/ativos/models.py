@@ -19,6 +19,12 @@ class Ativo(models.Model):
     def valor_investido(self):
         """Calcula o valor total investido no ativo"""
         return self.quantidade * self.preco_medio
+    
+    def valor_total(self):
+        """Calcula o valor total do ativo com base na quantidade e no preço atual"""
+        if self.preco_atual:
+            return self.quantidade * self.preco_atual
+        return 0
 
     def __str__(self):
         return f"{self.ticker} - {self.tipo}"
