@@ -23,15 +23,15 @@
                 <td>{{ ativo.tipo }}</td>
                 <td>{{ ativo.ticker }}</td>
                 <td>{{ ativo.quantidade }}</td>
-                <td>R$ {{ ativo.preco_medio }}</td>
+                <td>R$ {{ ativo.preco_medio|floatformat:2  }}</td>
                 <td>
                     {% if ativo.preco_atual %}
-                        R$ {{ ativo.preco_atual }}
+                        R$ {{ ativo.preco_atual|floatformat:2  }}
                     {% else %}
                         Não disponível
                     {% endif %}
                 </td>
-                <td>R$ {{ ativo.valor_total }}</td>
+                <td>R$ {{ ativo.valor_total|floatformat:2  }}</td>
                 <td>
                     <a href="{% url 'atualizar_ativo' ativo.pk %}" class="btn btn-warning">Atualizar</a>
                     <a href="{% url 'excluir_ativo' ativo.pk %}" class="btn btn-danger">Excluir</a>
