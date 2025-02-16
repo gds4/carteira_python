@@ -21,6 +21,7 @@ def listar_ativos(request):
     for ativo in ativos:
         preco_atual = obter_preco_ativo(ativo.ticker)
         ativo.preco_atual = preco_atual  
+        ativo.save() 
 
     return render(request, 'ativos/listar_ativos.html', {'ativos': ativos})
 
