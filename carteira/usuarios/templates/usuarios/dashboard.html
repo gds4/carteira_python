@@ -10,40 +10,27 @@
                 <h2 class="text-center">Bem-vindo ao Dashboard</h2>
                 <p class="text-center">Aqui você pode visualizar e gerenciar sua carteira de ações.</p>
                 
-                <!-- Seção de Visão Geral -->
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Visão Geral</h5>
-                                <p class="card-text">Acompanhe a performance das suas ações, veja gráficos e relatórios.</p>
-                                <a href="#" class="btn btn-primary w-100">Ver Detalhes</a>
-                            </div>
-                        </div>
+                <!-- Formulário de Seleção de Ação -->
+                <form method="GET" action="{% url 'dashboard' %}">
+                    <div class="form-group">
+                        <label for="ticker">Selecione uma ação:</label>
+                        <select name="ticker" id="ticker" class="form-control">
+                            <option value="">-- Selecione --</option>
+                            {% for ativo in ativos %}
+                                <option value="{{ ativo.ticker }}" {% if ativo.ticker == ticker_selecionado %}selected{% endif %}>{{ ativo.ticker }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
+                    <button type="submit" class="btn btn-primary mt-2">Visualizar</button>
+                </form>
 
-                    <!-- Botão para Cadastrar Ação -->
-                    <div class="col-md-4 mb-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Cadastrar Ação</h5>
-                                <p class="card-text">Adicione ações à sua carteira para começar a monitorá-las.</p>
-                                <a href="{% url 'cadastrar_ativo' %}" class="btn btn-primary w-100">Adicionar Ação</a>
-                            </div>
-                        </div>
+                <!-- Gráfico de Valorização -->
+                {% if graph %}
+                    <h3 class="mt-5">Gráfico de Valorização</h3>
+                    <div>
+                        {{ graph|safe }}
                     </div>
-
-                    <!-- Seção de Notificações -->
-                    <div class="col-md-4 mb-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Notificações</h5>
-                                <p class="card-text">Receba atualizações importantes sobre suas ações e o mercado.</p>
-                                <a href="#" class="btn btn-primary w-100">Ver Notificações</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% endif %}
 
                 <!-- Tabela de Ativos -->
                 <h3 class="mt-5">Meus Ativos</h3>

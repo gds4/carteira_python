@@ -78,3 +78,12 @@ def autocomplete_tickers(request):
                     tickers.append(item['symbol'])
 
     return JsonResponse({'tickers': tickers})
+
+def calcular_dividendos(ticker, data_compra):
+    try:
+        ativo = yf.Ticker(ticker)
+        dividendos = ativo.dividends
+        dividendos_recebidos = dividendos[dividendos.index >= str(data_compra)].sum()
+        return dividendos_recebidos
+    except Exception as e:
+        return 0

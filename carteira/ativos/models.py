@@ -26,6 +26,12 @@ class Ativo(models.Model):
             return self.quantidade * self.preco_atual
         return 0
 
+    def valorizacao(self):
+        """Calcula a valorização/desvalorização do ativo"""
+        if self.preco_atual:
+            return (self.preco_atual - self.preco_medio) / self.preco_medio * 100
+        return 0
+    
     def __str__(self):
         return f"{self.ticker} - {self.tipo}"
 
