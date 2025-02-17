@@ -25,10 +25,18 @@
                 </form>
 
                 <!-- Gráfico de Valorização -->
-                {% if graph %}
+                {% if graph_valorizacao %}
                     <h3 class="mt-5">Gráfico de Valorização</h3>
                     <div>
-                        {{ graph|safe }}
+                        {{ graph_valorizacao|safe }}
+                    </div>
+                {% endif %}
+
+                <!-- Gráfico de Dividendos -->
+                {% if graph_dividendos %}
+                    <h3 class="mt-5">Gráfico de Dividendos</h3>
+                    <div>
+                        {{ graph_dividendos|safe }}
                     </div>
                 {% endif %}
 
@@ -43,6 +51,9 @@
                             <th>Data de Compra</th>
                             <th>Preço Médio</th>
                             <th>Valor Investido</th>
+                            <th>Preço Atual</th>
+                            <th>Valor Total Atual</th>
+                            <th>Dividendos Recebidos</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -55,6 +66,9 @@
                             <td>{{ ativo.data_compra }}</td>
                             <td>{{ ativo.preco_medio }}</td>
                             <td>{{ ativo.valor_investido }}</td>
+                            <td>{{ ativo.preco_atual }}</td>
+                            <td>{{ ativo.valor_total }}</td>
+                            <td>{{ ativo.dividendos_recebidos|floatformat:2 }}</td>
                             <td>
                                 <a href="{% url 'atualizar_ativo' ativo.pk %}" class="btn btn-warning btn-sm">Atualizar</a>
                                 <a href="{% url 'excluir_ativo' ativo.pk %}" class="btn btn-danger btn-sm">Excluir</a>
@@ -62,7 +76,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="7" class="text-center">Nenhum ativo cadastrado</td>
+                            <td colspan="10" class="text-center">Nenhum ativo cadastrado</td>
                         </tr>
                         {% endfor %}
                     </tbody>
