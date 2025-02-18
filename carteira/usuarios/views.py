@@ -1,15 +1,18 @@
+import json
+import re
+
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+import yfinance as yf
 from ativos.models import Ativo
 from ativos.views import calcular_dividendos
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib import messages
 from django.shortcuts import redirect, render
-import plotly.express as px
-import pandas as pd
-import yfinance as yf
-import plotly.graph_objects as go
-
+from services.ai_report_service import AIReportService
 
 from .forms import RegistroForm
 
@@ -27,13 +30,17 @@ def registro(request):
         form = RegistroForm()
     return render(request, "usuarios/registro.html", {"form": form})
 
+
 def login_view(request):
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            messages.success(request, "Login realizado com sucesso!")
             return redirect("dashboard")
+        else:
+            messages.error(request, "Usuário ou senha inválidos.")
     else:
         form = AuthenticationForm()
     return render(request, "usuarios/login.html", {"form": form})
@@ -48,7 +55,7 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-    ativos = Ativo.objects.all()
+    ativos = Ativo.objects.filter(usuario=request.user)  # Filtrar ativos pelo usuário autenticado
     ticker_selecionado = request.GET.get('ticker')
     graph_valorizacao = None
     graph_dividendos = None
@@ -66,7 +73,7 @@ def dashboard(request):
         historico.reset_index(inplace=True)
 
         # Dados do usuário
-        ativos_usuario = Ativo.objects.filter(ticker=ticker_selecionado)
+        ativos_usuario = Ativo.objects.filter(ticker=ticker_selecionado, usuario=request.user)
         data_compra = ativos_usuario[0].data_compra
         preco_medio = float(ativos_usuario[0].preco_medio)
         quantidade_total = sum(ativo.quantidade for ativo in ativos_usuario)
@@ -103,3 +110,13 @@ def dashboard(request):
             graph_dividendos = "<p>Nenhum dividendo recebido desde a data de compra.</p>"
 
     return render(request, 'usuarios/dashboard.html', {'ativos': ativos, 'graph_valorizacao': graph_valorizacao, 'graph_dividendos': graph_dividendos, 'ticker_selecionado': ticker_selecionado})
+
+
+@login_required
+def resumo_carteira(request):
+    report_service = AIReportService(request.user)  
+    relatorio = report_service.generate_report()  
+
+    return render(request, 'usuarios/resumo_carteira.html', {
+        'relatorio': relatorio
+    })

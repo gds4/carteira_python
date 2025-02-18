@@ -1,4 +1,6 @@
+from django.contrib.auth.models import User
 from django.db import models
+
 
 class Ativo(models.Model):
     TIPO_ATIVO_CHOICES = [
@@ -7,7 +9,7 @@ class Ativo(models.Model):
         ('etf', 'ETF'),
         ('outro', 'Outro'),
     ]
-    
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     tipo = models.CharField(max_length=10, choices=TIPO_ATIVO_CHOICES)
     ticker = models.CharField(max_length=10)
     quantidade = models.PositiveIntegerField()
