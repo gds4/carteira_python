@@ -4,78 +4,79 @@
 
 {% block content %}
 <div class="container">
-    <h2>Cadastrar Novo Ativo</h2>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Cadastrar</button>
-    </form>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow p-4">
+                <h2 class="text-center mb-4">Cadastrar Novo Ativo</h2>
+                {% if messages %}
+                    <ul class="alert alert-danger">
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <!-- Campo Tipo -->
+                    <div class="mb-3">
+                        <label for="id_tipo" class="form-label">Tipo</label>
+                        {{ form.tipo }}
+                        {% if form.tipo.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.tipo.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
 
-    <!-- Dropdown de sugestões de tickers -->
-    <div class="mt-2">
-        <label for="ticker-input">Ticker:</label>
-        <input type="text" id="ticker-input" class="form-control" autocomplete="off" placeholder="Digite o ticker">
-        <select id="ticker-dropdown" class="form-control mt-2" size="5" style="display: none;">
-            <!-- As opções serão preenchidas dinamicamente -->
-        </select>
-    </div>
+                    <!-- Campo Ticker -->
+                    <div class="mb-3">
+                        <label for="id_ticker" class="form-label">Ticker</label>
+                        {{ form.ticker }}
+                        {% if form.ticker.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.ticker.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
 
-    {% if form.instance.pk %}
-        <div class="mt-4">
-            <h4>Preço Atual</h4>
-            {% if form.instance.preco_atual %}
-                <p>R$ {{ form.instance.preco_atual }}</p>
-            {% else %}
-                <p>Preço atual não disponível.</p>
-            {% endif %}
+                    <!-- Campo Quantidade -->
+                    <div class="mb-3">
+                        <label for="id_quantidade" class="form-label">Quantidade</label>
+                        {{ form.quantidade }}
+                        {% if form.quantidade.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.quantidade.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Campo Data de Compra -->
+                    <div class="mb-3">
+                        <label for="id_data_compra" class="form-label">Data de Compra</label>
+                        {{ form.data_compra }}
+                        {% if form.data_compra.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.data_compra.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Campo Preço Médio -->
+                    <div class="mb-3">
+                        <label for="id_preco_medio" class="form-label">Preço Médio</label>
+                        {{ form.preco_medio }}
+                        {% if form.preco_medio.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.preco_medio.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Cadastrar</button>
+                </form>
+            </div>
         </div>
-    {% endif %}
+    </div>
 </div>
-
-<script>
-    const tickerInput = document.getElementById('ticker-input');
-    const tickerDropdown = document.getElementById('ticker-dropdown');
-
-    // Evento de input para filtrar as opções do ticker
-    tickerInput.addEventListener('input', function() {
-        const query = this.value;
-        if (query.length > 0) {
-            fetch(`/autocomplete-tickers/?query=${query}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Limpa o dropdown
-                    tickerDropdown.innerHTML = '';
-
-                    // Adiciona as sugestões filtradas no dropdown
-                    if (data.tickers.length) {
-                        tickerDropdown.style.display = 'block';  // Exibe o dropdown
-                        data.tickers.forEach(ticker => {
-                            const option = document.createElement('option');
-                            option.value = ticker;
-                            option.textContent = ticker;
-                            tickerDropdown.appendChild(option);
-                        });
-                    } else {
-                        tickerDropdown.style.display = 'none';  // Oculta o dropdown se não houver sugestões
-                    }
-                });
-        } else {
-            tickerDropdown.style.display = 'none';  // Oculta o dropdown se a consulta estiver vazia
-        }
-    });
-
-    // Quando o usuário seleciona uma opção, preencher o campo de texto
-    tickerDropdown.addEventListener('change', function() {
-        tickerInput.value = tickerDropdown.value;
-        tickerDropdown.style.display = 'none';  // Fecha o dropdown
-    });
-
-    // Fecha o dropdown se clicar fora dele
-    document.addEventListener('click', function(e) {
-        if (!tickerInput.contains(e.target) && !tickerDropdown.contains(e.target)) {
-            tickerDropdown.style.display = 'none';  // Fecha o dropdown
-        }
-    });
-</script>
-
 {% endblock %}
