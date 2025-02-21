@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -8,13 +9,14 @@ class Ativo(models.Model):
         ('etf', 'ETF'),
         ('outro', 'Outro'),
     ]
-    
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     tipo = models.CharField(max_length=10, choices=TIPO_ATIVO_CHOICES)
     ticker = models.CharField(max_length=10)
     quantidade = models.PositiveIntegerField()
     data_compra = models.DateField()
     preco_medio = models.DecimalField(max_digits=10, decimal_places=2)
     preco_atual = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    dividendos_recebidos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def valor_investido(self):
         """Calcula o valor total investido no ativo"""
@@ -26,6 +28,12 @@ class Ativo(models.Model):
             return self.quantidade * self.preco_atual
         return 0
 
+    def valorizacao(self):
+        """Calcula a valorização/desvalorização do ativo"""
+        if self.preco_atual:
+            return (self.preco_atual - self.preco_medio) / self.preco_medio * 100
+        return 0
+     
     def __str__(self):
         return f"{self.ticker} - {self.tipo}"
 

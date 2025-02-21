@@ -1,5 +1,6 @@
 import requests
 import yfinance as yf
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -14,9 +15,11 @@ def obter_preco_ativo(ticker):
         return preco_atual
     except Exception as e:
         return None  
-
+    
+    
+@login_required
 def listar_ativos(request):
-    ativos = Ativo.objects.all()
+    ativos = Ativo.objects.filter(usuario=request.user) 
 
     for ativo in ativos:
         preco_atual = obter_preco_ativo(ativo.ticker)
@@ -26,11 +29,14 @@ def listar_ativos(request):
     return render(request, 'ativos/listar_ativos.html', {'ativos': ativos})
 
 
+@login_required
 def cadastrar_ativo(request):
     if request.method == 'POST':
         form = AtivoForm(request.POST)
         if form.is_valid():
-            novo_ativo = form.save()  
+            novo_ativo = form.save(commit=False)
+            novo_ativo.usuario = request.user  
+            novo_ativo.save()
             preco_atual = obter_preco_ativo(novo_ativo.ticker)
             novo_ativo.preco_atual = preco_atual  
             novo_ativo.save()
@@ -39,8 +45,9 @@ def cadastrar_ativo(request):
         form = AtivoForm()
     return render(request, 'ativos/cadastrar_ativo.html', {'form': form})
 
+@login_required
 def atualizar_ativo(request, pk):
-    ativo = get_object_or_404(Ativo, pk=pk)
+    ativo = get_object_or_404(Ativo, pk=pk, usuario=request.user)  
     if request.method == 'POST':
         form = AtivoForm(request.POST, instance=ativo)
         if form.is_valid():
@@ -53,15 +60,13 @@ def atualizar_ativo(request, pk):
         form = AtivoForm(instance=ativo)
     return render(request, 'ativos/atualizar_ativo.html', {'form': form, 'ativo': ativo})
 
+@login_required
 def excluir_ativo(request, pk):
-    ativo = get_object_or_404(Ativo, pk=pk)
+    ativo = get_object_or_404(Ativo, pk=pk, usuario=request.user)  
     if request.method == 'POST':
         ativo.delete()
         return redirect('listar_ativos')
     return render(request, 'ativos/excluir_ativo.html', {'ativo': ativo})
-
-import requests
-
 
 def autocomplete_tickers(request):
     query = request.GET.get('query', '')
@@ -78,3 +83,15 @@ def autocomplete_tickers(request):
                     tickers.append(item['symbol'])
 
     return JsonResponse({'tickers': tickers})
+
+
+def calcular_dividendos(ticker, data_compra):
+    try:
+        ativo = yf.Ticker(ticker)
+        dividendos = ativo.dividends
+        print(f"Dividendos para {ticker} desde {data_compra}: {dividendos[dividendos.index >= str(data_compra)]}")
+        dividendos_recebidos = dividendos[dividendos.index >= str(data_compra)].sum()
+        return dividendos_recebidos
+    except Exception as e:
+        print(f"Erro ao calcular dividendos para {ticker}: {e}")
+        return 0
