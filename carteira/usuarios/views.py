@@ -53,10 +53,11 @@ def logout_view(request):
 
 
 
+
 @login_required
 def dashboard(request):
     ativos = Ativo.objects.filter(usuario=request.user)  # Filtrar ativos pelo usuário autenticado
-    ticker_selecionado = request.GET.get('ticker')
+    ativo_id_selecionado = request.GET.get('ativo_id')
     graph_valorizacao = None
     graph_dividendos = None
 
@@ -67,16 +68,18 @@ def dashboard(request):
         ativo.dividendos_recebidos = dividendos_recebidos
         ativo.save()
 
-    if ticker_selecionado:
+    if ativo_id_selecionado:
+        ativo_selecionado = Ativo.objects.get(id=ativo_id_selecionado, usuario=request.user)
+        ticker_selecionado = ativo_selecionado.ticker
         ativo = yf.Ticker(ticker_selecionado)
-        historico = ativo.history(period="1y")  # Obtém o histórico de 1 ano
+        data_compra = ativo_selecionado.data_compra
+        start_date = (data_compra - pd.DateOffset(months=6)).strftime('%Y-%m-%d')  # 6 meses antes da data de compra
+        historico = ativo.history(start=start_date)  # Obtém o histórico a partir de 6 meses antes da data de compra
         historico.reset_index(inplace=True)
 
         # Dados do usuário
-        ativos_usuario = Ativo.objects.filter(ticker=ticker_selecionado, usuario=request.user)
-        data_compra = ativos_usuario[0].data_compra
-        preco_medio = float(ativos_usuario[0].preco_medio)
-        quantidade_total = sum(ativo.quantidade for ativo in ativos_usuario)
+        preco_medio = float(ativo_selecionado.preco_medio)
+        quantidade_total = ativo_selecionado.quantidade
 
         # Criar o gráfico de valorização
         fig_valorizacao = go.Figure()
@@ -109,7 +112,7 @@ def dashboard(request):
         else:
             graph_dividendos = "<p>Nenhum dividendo recebido desde a data de compra.</p>"
 
-    return render(request, 'usuarios/dashboard.html', {'ativos': ativos, 'graph_valorizacao': graph_valorizacao, 'graph_dividendos': graph_dividendos, 'ticker_selecionado': ticker_selecionado})
+    return render(request, 'usuarios/dashboard.html', {'ativos': ativos, 'graph_valorizacao': graph_valorizacao, 'graph_dividendos': graph_dividendos, 'ativo_id_selecionado': ativo_id_selecionado})
 
 
 @login_required
