@@ -69,7 +69,10 @@ def dashboard(request):
 
     if ticker_selecionado:
         ativo = yf.Ticker(ticker_selecionado)
-        historico = ativo.history(period="1y")  # Obtém o histórico de 1 ano
+        ativos_usuario = Ativo.objects.filter(ticker=ticker_selecionado, usuario=request.user)
+        data_compra = ativos_usuario[0].data_compra
+        start_date = (data_compra - pd.DateOffset(months=6)).strftime('%Y-%m-%d')  # 6 meses antes da data de compra
+        historico = ativo.history(start=start_date)  # Obtém o histórico a partir de 6 meses antes da data de compra
         historico.reset_index(inplace=True)
 
         # Dados do usuário
