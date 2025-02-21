@@ -1,4 +1,4 @@
-<!-- filepath: carteira/usuarios/templates/usuarios/dashboard.html -->
+<!-- filepath: /c:/Users/r1k/Documents/carteira_acoes_web_python/carteira/usuarios/templates/usuarios/dashboard.html -->
 {% extends "base.html" %}
 
 {% block title %}Dashboard{% endblock %}
@@ -11,14 +11,14 @@
                 <h2 class="text-center">Bem-vindo ao Dashboard</h2>
                 <p class="text-center">Aqui você pode visualizar e gerenciar sua carteira de ações.</p>
                 
-                <!-- Formulário de Seleção de Ação -->
+                <!-- Formulário de Seleção de Ativo -->
                 <form method="GET" action="{% url 'dashboard' %}">
                     <div class="form-group">
-                        <label for="ticker">Selecione uma ação:</label>
-                        <select name="ticker" id="ticker" class="form-control">
+                        <label for="ativo_id">Selecione um ativo:</label>
+                        <select name="ativo_id" id="ativo_id" class="form-control">
                             <option value="">-- Selecione --</option>
                             {% for ativo in ativos %}
-                                <option value="{{ ativo.ticker }}" {% if ativo.ticker == ticker_selecionado %}selected{% endif %}>{{ ativo.ticker }}</option>
+                                <option value="{{ ativo.id }}" {% if ativo.id == ativo_id_selecionado %}selected{% endif %}>{{ ativo.ticker }} - {{ ativo.data_compra }}</option>
                             {% endfor %}
                         </select>
                     </div>
