@@ -76,7 +76,7 @@ class AIReportService:
         payload = {
             "model": "mistralai/mistral-7b-instruct",  
             "messages": [
-                {"role": "system", "content": "Você é um assistente financeiro."},
+                {"role": "system", "content": "Você é um especialista em mercado financerio, dedicado a assistir e, sobretudo, educar os seus clientes sobre seus investimentos."},
                 {"role": "user", "content": prompt}
             ],
             "temperature": 0.7,
